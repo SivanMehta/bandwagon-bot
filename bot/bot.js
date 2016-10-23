@@ -6,7 +6,7 @@
  */
 
 /* Configure the Twitter API */
-const config = require('./config.json')
+const config = require('../config.json')
 var TWITTER_CONSUMER_KEY = config.TWITTER_CONSUMER_KEY;
 var TWITTER_CONSUMER_SECRET = config.TWITTER_CONSUMER_SECRET;
 var TWITTER_ACCESS_TOKEN = config.TWITTER_ACCESS_TOKEN;
@@ -27,10 +27,7 @@ var Bot = new Twit({
 	access_token_secret: TWITTER_ACCESS_TOKEN_SECRET
 });
 
-console.log('The bot is running...');
-
-function getTrends() {
-
+function getTrends(req, res) {
 	var query = {
 		id: WOEID
 	}
@@ -38,12 +35,14 @@ function getTrends() {
 	Bot.get('trends/place', query, (err, data, response) => {
 
 		if (err) {
-			console.log('Bot could not find latest tweet, : ' + error);
+			console.log('Bot could not find latest trends, : ' + error);
 		}
 
-    console.log(data[0].trends.map(trend => trend.name))
+    res.send(data[0].trends.map(trend => trend.name))
 
 	});
 }
 
-getTrends();
+exports.init = (app) => {
+  app.get('/', getTrends)
+}
