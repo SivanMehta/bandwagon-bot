@@ -48,7 +48,10 @@ function generateTweet(req, res) {
     count: 20,
     lang: 'en',
     result_type: 'popular'}, (err, data, response) => {
-    res.send(data.statuses.map(tweet => tweet.text));
+      const tweets = data.statuses.map(tweet => tweet.text)
+      chain.generateTweet(tweets, (tweet) => {
+        res.send(tweet)
+      })
   })
 }
 
