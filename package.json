@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "description": "Bot that uses Markov chains to parrot whatever is trending",
   "dependencies": {
+    "async": "^2.1.2",
     "express": "^4.14.0",
+    "markovchain": "^1.0.2",
     "morgan": "^1.7.0",
     "twit": "^2.1.1"
   },
