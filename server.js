@@ -8,7 +8,6 @@ app.use(morgan('dev'))
 // initialize bot
 require('./bot/bot.js').init(app)
 
-
 // get correct port
 const PORT = process.env.PORT || 5000
 app.set('port', PORT);
