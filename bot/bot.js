@@ -51,8 +51,8 @@ function getTrendingTopics() {
       console.log('Bot could not find latest trends, : ' + error);
     }
 
-    var trends = data[0].trends.map(trend => trend.name)
-    trends = trends.sort((a, b) => a.tweet_volume - b.tweet_volume)
+    var trends = data[0].trends.sort((a, b) => b.tweet_volume - a.tweet_volume)
+    trends = trends.map(trend => trend.name)
     trends = trends.slice(0,3)
     async.each(trends, (trend, next) => {
       generateTweet(trend, (tweet) => {
