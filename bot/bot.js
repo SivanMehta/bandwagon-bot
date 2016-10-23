@@ -1,8 +1,8 @@
-var Twit = require('twit')
+var twitter = require('twit')
 var async = require('async')
 
 const config = require('./config.js')
-var Bot = new Twit({
+var Bot = new twitter({
   consumer_key: config.TWITTER_CONSUMER_KEY,
   consumer_secret: config.TWITTER_CONSUMER_SECRET,
   access_token: config.TWITTER_ACCESS_TOKEN,
@@ -48,7 +48,7 @@ function getTrendingTopics() {
 
   Bot.get('trends/place', query, (err, data, response) => {
     if (err) {
-      console.log('Bot could not find latest trends, : ' + error);
+      console.log('Bot could not find latest trends, : ' + err);
     }
 
     var trends = data[0].trends.sort((a, b) => b.tweet_volume - a.tweet_volume)
