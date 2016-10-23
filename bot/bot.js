@@ -37,18 +37,24 @@ function getTrends(req, res) {
 	});
 }
 
-function generateTweet(req, res) {
+function forceTweet(req, res) {
+  generateTweet(req.params.topic, (tweet) => {
+    if(req.query.password && req.query.password == config.password) {
+      postTweet(tweet)
+    }
+    res.send(tweet)
+  })
+}
+
+function generateTweet(topic, callback) {
   Bot.get('search/tweets', {
-    q: req.params.about + '-filter:links',
+    q: topic + '-filter:links',
     count: 20,
     lang: 'en',
     result_type: 'popular'}, (err, data, response) => {
       const tweets = data.statuses.map(tweet => tweet.text)
-      chain.generateTweet(tweets, req.params.about, (tweet) => {
-        res.send(tweet)
-        if(req.query.password && req.query.password == config.password) {
-          postTweet(tweet)
-        }
+      chain.generateTweet(tweets, topic, (tweet) => {
+        callback(tweet)
       })
   })
 }
@@ -60,6 +66,6 @@ function postTweet(tweet) {
 }
 
 exports.init = (app) => {
-  app.get('/', getTrends)
-  app.get('/tweet/:about', generateTweet)
+  app.get('/', (req, res) => { res.redirect('https://twitter.com/BandwagonBot') })
+  app.get('/forceTweet/:topic', forceTweet)
 }
