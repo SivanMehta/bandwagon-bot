@@ -1,5 +1,5 @@
-/* Configure the Twitter API */
 var Twit = require('twit')
+var async = require('async')
 
 const config = require('./config.js')
 var Bot = new Twit({
@@ -12,31 +12,6 @@ var Bot = new Twit({
 /* Markov Chain Module */
 var chain = require('./chain')
 
-/* Where on Earth? ID for Pittsburgh, PA */
-var WOEID = 2473224
-
-var trending = []
-function getTrends(req, res) {
-  if(trending.length != 0) {
-    res.send(trending)
-    return
-  }
-
-	var query = {
-		id: WOEID
-	}
-
-	Bot.get('trends/place', query, (err, data, response) => {
-
-		if (err) {
-			console.log('Bot could not find latest trends, : ' + error)
-		}
-
-    trending = data[0].trends.map(trend => trend.name)
-    res.send(trending)
-	});
-}
-
 function forceTweet(req, res) {
   generateTweet(req.params.topic, (tweet) => {
     if(req.query.password && req.query.password == config.password) {
@@ -47,6 +22,7 @@ function forceTweet(req, res) {
 }
 
 function generateTweet(topic, callback) {
+  console.log('tweeting about: ' + topic)
   Bot.get('search/tweets', {
     q: topic + '-filter:links',
     count: 20,
@@ -65,7 +41,33 @@ function postTweet(tweet) {
   })
 }
 
+function getTrendingTopics() {
+  var query = {
+    id: config.WOEID
+  }
+
+  Bot.get('trends/place', query, (err, data, response) => {
+    if (err) {
+      console.log('Bot could not find latest trends, : ' + error);
+    }
+
+    var trends = data[0].trends.map(trend => trend.name)
+    trends = trends.sort((a, b) => a.tweet_volume - b.tweet_volume)
+    trends = trends.slice(0,3)
+    async.each(trends, (trend, next) => {
+      generateTweet(trend, (tweet) => {
+        postTweet(tweet)
+      })
+    })
+  });
+
+  // loop forever
+  setTimeout(getTrendingTopics, config.interval)
+}
+
 exports.init = (app) => {
   app.get('/', (req, res) => { res.redirect('https://twitter.com/BandwagonBot') })
   app.get('/forceTweet/:topic', forceTweet)
+
+  getTrendingTopics()
 }
