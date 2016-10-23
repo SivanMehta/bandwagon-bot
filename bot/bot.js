@@ -43,15 +43,26 @@ function getTrends(req, res) {
 }
 
 function generateTweet(req, res) {
-  Bot.get('search/tweets', {
-    q: req.params.about + '-filter:links',
-    count: 20,
-    lang: 'en',
-    result_type: 'popular'}, (err, data, response) => {
-      const tweets = data.statuses.map(tweet => tweet.text)
-      chain.generateTweet(tweets, (tweet) => {
-        res.send(tweet)
+  if(req.query.password && req.query.password == config.password) {
+    Bot.get('search/tweets', {
+      q: req.params.about + '-filter:links',
+      count: 20,
+      lang: 'en',
+      result_type: 'popular'}, (err, data, response) => {
+        const tweets = data.statuses.map(tweet => tweet.text)
+        chain.generateTweet(tweets, req.params.about, (tweet) => {
+          res.send(tweet)
+          postTweet(tweet)
+        })
       })
+  } else {
+    res.send('Incorrect password')
+  }
+}
+
+function postTweet(tweet) {
+  Bot.post('/statuses/update', {status: tweet}, (err, data, response) => {
+    console.log(tweet)
   })
 }
 
