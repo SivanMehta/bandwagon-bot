@@ -1,5 +1,5 @@
 var MarkovChain = require('markovchain')
-var async = require('async');
+var async = require('async')
 
 function generateTweet(tweets) {
   var parrot = new MarkovChain()
