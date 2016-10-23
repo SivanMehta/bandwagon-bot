@@ -14,6 +14,9 @@ var Bot = new Twit({
   access_token_secret: TWITTER_ACCESS_TOKEN_SECRET
 })
 
+/* Markov Chain Module */
+var chain = require('./chain')
+
 /* Where on Earth? ID for Pittsburgh, PA */
 var WOEID = 2473224
 
@@ -39,7 +42,17 @@ function getTrends(req, res) {
 	});
 }
 
+function generateTweet(req, res) {
+  Bot.get('search/tweets', {
+    q: req.params.about + '-filter:links',
+    count: 20,
+    lang: 'en',
+    result_type: 'popular'}, (err, data, response) => {
+    res.send(data.statuses.map(tweet => tweet.text));
+  })
+}
+
 exports.init = (app) => {
   app.get('/', getTrends)
-  app.get()
+  app.get('/tweet/:about', generateTweet)
 }
