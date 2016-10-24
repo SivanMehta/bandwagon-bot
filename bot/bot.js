@@ -10,9 +10,6 @@ var Bot = new twitter({
   access_token_secret: config.TWITTER_ACCESS_TOKEN_SECRET
 })
 
-/* Markov Chain Module */
-var chain = require('./chain')
-
 function forceTweet(req, res) {
   generateTweet(req.params.topic, (tweet) => {
     if(req.query.password && req.query.password == config.password) {
@@ -22,15 +19,15 @@ function forceTweet(req, res) {
   })
 }
 
+var chain = require('./chain')
 function generateTweet(topic, callback) {
   console.log('tweeting about: ' + topic)
   Bot.get('search/tweets', {
     q: topic + '-filter:links',
-    count: 20,
+    count: 50,
     lang: 'en',
     result_type: 'popular'}, (err, data, response) => {
-      const tweets = data.statuses.map(tweet => tweet.text)
-      chain.generateTweet(tweets, topic, (tweet) => {
+      chain.generateTweet(data.statuses, topic, (tweet) => {
         callback(tweet)
       })
   })
@@ -75,5 +72,5 @@ exports.init = (app) => {
   app.get('/', (req, res) => { res.redirect('https://twitter.com/BandwagonBot') })
   app.get('/forceTweet/:topic', forceTweet)
 
-  getTrendingTopics()
+  // getTrendingTopics()
 }
