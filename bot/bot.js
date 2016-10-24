@@ -1,5 +1,6 @@
 var twitter = require('twit')
 var async = require('async')
+var request = require('request')
 
 const config = require('./config.js')
 var Bot = new twitter({
@@ -60,6 +61,11 @@ function getTrendingTopics() {
       })
     })
   });
+
+  // ping heroku app to prevent from falling asleep
+  request.get('https://bandwagon-bot.herokuapp.com/forceTweet/trump', (err, response, body) => {
+    console.log(body)
+  })
 
   // loop forever
   setTimeout(getTrendingTopics, config.interval)
