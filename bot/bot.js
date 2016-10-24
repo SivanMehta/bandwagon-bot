@@ -72,5 +72,5 @@ exports.init = (app) => {
   app.get('/', (req, res) => { res.redirect('https://twitter.com/BandwagonBot') })
   app.get('/forceTweet/:topic', forceTweet)
 
-  // getTrendingTopics()
+  getTrendingTopics()
 }
