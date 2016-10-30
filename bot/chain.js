@@ -14,7 +14,7 @@ function generateTweet(tweets, topic, callback) {
     if(err) {
       console.error(err);
     } else {
-      const tweet = topic + ':\n' + parrot.end(20).process()
+      const tweet = topic + ': ' + parrot.end(20).process()
       callback(tweet)
     }
   })
